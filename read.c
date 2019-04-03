@@ -1,8 +1,3 @@
-
-    
-
-
-
 #define MAX 100
 
 void read(FILE *file, char* name, size_t *arreglo){
