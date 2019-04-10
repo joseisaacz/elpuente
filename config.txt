@@ -1,4 +1,3 @@
-
 10  #longitud del puente
 2   #modo en que se va a ejecutar (normal, semáforo o tránsito)
 #Datos del ESTE

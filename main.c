@@ -1,31 +1,66 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "read1.c"
-#include "read2.c"
+#include <pthread.h>
+#include "creacion.c"
+#include <math.h>
+#include <time.h>
+//datos de configuracion
 size_t arreglo[]={};
-size_t array[]={};
+//arreglo de  mutex recurso compartido 
+//el puente
+pthread_mutex_t puente[]={};
+
+float randomentre();
+float formula(int promedio);
+void crearpuente();
 int main(){
-        FILE* fp;
-        char* filename="config.txt";
-        read(fp, filename, arreglo);
-        read1(fp, filename, array);
-for (int i=0; i< 16; i++){
-        printf("%d",arreglo[i]);
+/*FILE* fp;
+char* filename="config.txt";
+read(fp, filename, arreglo);
+asignavalores(arreglo);*/
+
+printf("%f", formula(200));
 printf("\n");
 }
-printf("\n");
-/*for (int i=0; i< 16; i++){
-        printf("%d",array[i]);
-printf("\n");
+float formula(int promedio){
+        float ln= log(1-randomentre());
+        return -promedio * ln;
 }
-printf("\n");
-printf("%d", arreglo[3]);
-printf("\n");*/
+float randomentre(){
+        time_t t;
+        srand((unsigned) time(&t));
+
+return ( (float) (rand()%10000) / 10000  );
+}
+void crearpuente(){
+for(int i=0; i</*longitudpuente*/10; i++){
+pthread_mutex_t s;
+pthread_mutex_init(&s, NULL);
+puente[i] = s;
         }
+}
 
 
 
-        /*char str[MAX];
+
+
+
+
+
+
+
+
+/* FILE* fp;
+        char* filename="config.txt";
+        read(fp, filename, arreglo);*/
+
+
+/*for (int i=0; i< 16; i++){
+        printf("%lu",arreglo[i]);#include <math.h>
+printf("\n");
+}
+
+char str[MAX];
                 fp= fopen(filename, "r");
                 if(fp==NULL){
                 printf("no se puede abrir %s",filename);
