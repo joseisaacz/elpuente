@@ -13,6 +13,8 @@ pthread_mutex_t puente[]={};
 float randomentre();
 float formula(int promedio);
 void crearpuente();
+void* crearcarro(void* p);
+int calculavelocidad(int vmax, int vmin);
 int main(){
 /*FILE* fp;
 char* filename="config.txt";
@@ -20,6 +22,8 @@ read(fp, filename, arreglo);
 asignavalores(arreglo);*/
 
 printf("%f", formula(200));
+printf("\n");
+printf("%d", calculavelocidad(8,4));
 printf("\n");
 }
 float formula(int promedio){
@@ -32,6 +36,11 @@ float randomentre(){
 
 return ( (float) (rand()%10000) / 10000  );
 }
+int calculavelocidad(int vmax, int vmin){
+        time_t t;
+        srand((unsigned) time(&t));
+        return (rand()%(vmax - vmin+1)) + vmin;
+}
 void crearpuente(){
 for(int i=0; i</*longitudpuente*/10; i++){
 pthread_mutex_t s;
@@ -40,6 +49,11 @@ puente[i] = s;
         }
 }
 
+
+
+void* crearcarro(void* p){
+
+}
 
 
 
