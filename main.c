@@ -10,20 +10,23 @@ size_t arreglo[]={};
 //arreglo de  mutex recurso compartido 
 //el puente
 pthread_mutex_t puente[]={};
-int* probaAmbulancia(int cantidad,int totalCarros);
-int cantidadAmbulanciasEste();
-int cantidadAmbulanciasOeste();
+//random entre 0 y 1
 float randomentre();
+//funcion que calcula la llegada (nanosleep)
 float formula(int promedio);
+//funcion para llenar el puente 
 void crearpuente();
+//crea el thread con todos los parametros
 void* crearcarro(void* p);
+//devuelve un random entre los parametros ingresados
 int calculavelocidad(int vmax, int vmin);
+//calcula si es ambulancia 
+
 int main(){
 /*FILE* fp;
 char* filename="config.txt";
 read(fp, filename, arreglo);
 asignavalores(arreglo);*/
-
 printf("%f", formula(200));
 printf("\n");
 printf("%d", calculavelocidad(8,4));
@@ -61,30 +64,9 @@ int calculavelocidad(int vmax, int vmin){
 }
 
 
-int cantidadAmbulanciasEste(){
-return (int)arreglo[9]*100 /arreglo[3];
-}
-int cantidadAmbulanciasOeste(){
-      return (int)arreglo[17]*100 /arreglo[11];  
-}
 
-int* probaAmbulancia(int cantidadAmbu,int totalCarros){
- int array[cantidadAmbu];
- srand(time(NULL));
- int rangoReal=(int)totalCarros/cantidadAmbu;
- int rangoVariable;
- int numero=0;
- int i=0;
- for(i; i<cantidadAmbu; i++){
-  rangoVariable=numero+rangoReal;
-  if(rangoVariable>totalCarros)
-        rangoVariable=totalCarros;
 
-  numero=(int)rand() % rangoVariable + (numero+1);
-  array[i]=numero;
- }
- return array;
-}
+
 
 
 
