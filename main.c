@@ -4,6 +4,7 @@
 #include "creacion.c"
 #include <math.h>
 #include <time.h>
+#include <unistd.h>
 //datos de configuracion
 size_t arreglo[]={};
 //arreglo de  mutex recurso compartido 
@@ -25,6 +26,11 @@ printf("%f", formula(200));
 printf("\n");
 printf("%d", calculavelocidad(8,4));
 printf("\n");
+time_t t;
+        srand((unsigned) time(&t));
+printf("%d", (rand()%100));
+printf("\n");
+
 }
 float formula(int promedio){
         float ln= log(1-randomentre());
@@ -36,11 +42,6 @@ float randomentre(){
 
 return ( (float) (rand()%10000) / 10000  );
 }
-int calculavelocidad(int vmax, int vmin){
-        time_t t;
-        srand((unsigned) time(&t));
-        return (rand()%(vmax - vmin+1)) + vmin;
-}
 void crearpuente(){
 for(int i=0; i</*longitudpuente*/10; i++){
 pthread_mutex_t s;
@@ -48,12 +49,15 @@ pthread_mutex_init(&s, NULL);
 puente[i] = s;
         }
 }
-
-
-
 void* crearcarro(void* p){
 
 }
+int calculavelocidad(int vmax, int vmin){
+        time_t t;
+        srand((unsigned) time(&t));
+        return (rand()%(vmax - vmin+1)) + vmin;
+}
+
 
 
 
