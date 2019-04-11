@@ -21,6 +21,10 @@ void* crearcarro(void* p);
 //devuelve un random entre los parametros ingresados
 int calculavelocidad(int vmax, int vmin);
 //calcula si es ambulancia 
+int* probaAmbulancia(int cantidad,int totalCarros);
+int cantidadAmbulanciasEste(); //calcula la cantidad de ambulacias en Este
+int cantidadAmbulanciasOeste();//calcula la cantidad de ambulacias en Oeste
+
 
 int main(){
 /*FILE* fp;
@@ -64,8 +68,30 @@ int calculavelocidad(int vmax, int vmin){
 }
 
 
+int cantidadAmbulanciasEste(){
+return (int)arreglo[9]*100 /arreglo[3];
+}
+int cantidadAmbulanciasOeste(){
+      return (int)arreglo[17]*100 /arreglo[11];  
+}
 
+int* probaAmbulancia(int cantidadAmbu,int totalCarros){
+ int array[cantidadAmbu];
+ srand(time(NULL));
+ int rangoReal=(int)totalCarros/cantidadAmbu;
+ int rangoVariable;
+ int numero=0;
+ int i=0;
+ for(i; i<cantidadAmbu; i++){
+  rangoVariable=numero+rangoReal;
+  if(rangoVariable>totalCarros)
+        rangoVariable=totalCarros;
 
+  numero=(int)rand() % rangoVariable + (numero+1);
+  array[i]=numero;
+ }
+ return array;
+}
 
 
 
