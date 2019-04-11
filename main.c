@@ -10,7 +10,9 @@ size_t arreglo[]={};
 //arreglo de  mutex recurso compartido 
 //el puente
 pthread_mutex_t puente[]={};
-
+int* probaAmbulancia(int cantidad,int totalCarros);
+int cantidadAmbulanciasEste();
+int cantidadAmbulanciasOeste();
 float randomentre();
 float formula(int promedio);
 void crearpuente();
@@ -59,9 +61,30 @@ int calculavelocidad(int vmax, int vmin){
 }
 
 
+int cantidadAmbulanciasEste(){
+return (int)arreglo[9]*100 /arreglo[3];
+}
+int cantidadAmbulanciasOeste(){
+      return (int)arreglo[17]*100 /arreglo[11];  
+}
 
+int* probaAmbulancia(int cantidadAmbu,int totalCarros){
+ int array[cantidadAmbu];
+ srand(time(NULL));
+ int rangoReal=(int)totalCarros/cantidadAmbu;
+ int rangoVariable;
+ int numero=0;
+ int i=0;
+ for(i; i<cantidadAmbu; i++){
+  rangoVariable=numero+rangoReal;
+  if(rangoVariable>totalCarros)
+        rangoVariable=totalCarros;
 
-
+  numero=(int)rand() % rangoVariable + (numero+1);
+  array[i]=numero;
+ }
+ return array;
+}
 
 
 
