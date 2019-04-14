@@ -4,13 +4,15 @@
 300 #Cantidad de carros
 5   #Promedio de llegada
 6   #Tiempo del semaforo
-4 8 #Velocidad minima y maxima
+4  #Velocidad minima
+8   y maxima
 7   #Cantidad de vehiculos por paso
 4   #Porcentaje de ambulancias
 #Datos de OESTE
 288 #Cantidad de carros
 7   #Promedio de llegada
 3   #Tiempo del semaforo
-12 30 #Velocidad minima y maxima
+12  #Velocidad minima
+30  y maxima
 3   #Cantidad de vehiculos por paso
 40  #Porcentaje de ambulancias
