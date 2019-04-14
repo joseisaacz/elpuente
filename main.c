@@ -26,7 +26,8 @@ int calculavelocidad(int vmax, int vmin);
 int* probaAmbulancia(int cantidad,int totalCarros);
 int cantidadAmbulanciasEste(); //calcula la cantidad de ambulacias en Este
 int cantidadAmbulanciasOeste();//calcula la cantidad de ambulacias en Oeste
-
+int contadorCarrosEste=0; //Contador de carros creados en el este
+int contadorCarrosOeste=0; //Contador de carros creados en el oeste
 
 int main(){
 FILE* fp;
@@ -66,6 +67,16 @@ puente[i] = s;
 }
 
 void* carroEO(void* p){
+contadorCarrosEste++;
+bool esAmbulancia=false;
+int cantidadAmbulancias=cantidadAmbulanciasEste();
+int * array=probaAmbulancia(cantidadAmbulanciasEste(),arreglo[3])
+for(int i=0; i<cantidadAmbulancias;i++){
+        if(contadorCarrosEste==array[i]){
+                esAmbulancia=true;
+                break;
+        }
+}       
 int modo= arreglo[1];
 int velocidad = calculavelocidad(arreglo[6],arreglo[7]);
 pthread_mutex_lock(&puente[0]);
@@ -77,6 +88,16 @@ nanosleep(1/velocidad);
 }
 
 void* carroOE(void* p){
+contadorCarrosOeste++;
+bool esAmbulancia=false;
+int cantidadAmbulancias=cantidadAmbulanciasOeste();
+int* array=probaAmbulancia(cantidadAmbulancias,arreglo[11]);
+for(int i=0;i<cantidadAmbulancias; i++){
+        if(array[i]==contadorCarrosOeste){
+         esAmbulancia=true;
+         break;
+        }
+}        
 int modo= arreglo[1];
 int velocidad = calculavelocidad(arreglo[14],arreglo[15]);
 pthread_mutex_lock(&puente[0]);
