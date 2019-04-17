@@ -11,7 +11,7 @@
 size_t arreglo[]={};
 //arreglo de  mutex recurso compartido 
 //el puente
-pthread_mutex_t puente[]={};
+pthread_mutex_t puente[10];
 //random entre 0 y 1
 float randomentre();
 //funcion que calcula la llegada (nanosleep)
@@ -74,12 +74,11 @@ float randomentre(){
 
 return ( (float) (rand()%10000) / 10000  );
 }
+
 void crearpuente(){
 for(int i=0; i<arreglo[0]; i++){
-pthread_mutex_t s;
-printf("ok");
-pthread_mutex_init(&s, NULL);
-puente[i] = s;
+printf("%ld", arreglo[0]);
+pthread_mutex_init(&puente[i], NULL);
         }
 }
 
@@ -127,12 +126,13 @@ pthread_mutex_lock(&puente[0]);
        // }
 int i=1;
 while(i<arreglo[0]){
-pthread_mutex_unlock(&puente[0]);
-//pthread_mutex_lock(&puente[i]);
+//pthread_mutex_unlock(&puente[0]);
+pthread_mutex_lock(&puente[i]);
 usleep(1);
-//pthread_mutex_unlock(&puente[i-1]);
+pthread_mutex_unlock(&puente[i-1]);
 //pthread_mutex_lock(&puente[i]);
 printf("soy carro y voy por la posicion %d",i);
+printf("\n");
 //time_t sec= (time_t) 1/velocidad;
 i++;
 }
