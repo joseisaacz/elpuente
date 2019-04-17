@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <stdbool.h>
+#include<unistd.h>
 #include "creacion.c"
 #include "read.c"
 #include <math.h>
@@ -23,27 +25,41 @@ void* carroOE(void* p);
 //devuelve un random entre los parametros ingresados
 int calculavelocidad(int vmax, int vmin);
 //calcula si es ambulancia 
-int* probaAmbulancia(int cantidad,int totalCarros);
-int cantidadAmbulanciasEste(); //calcula la cantidad de ambulacias en Este
-int cantidadAmbulanciasOeste();//calcula la cantidad de ambulacias en Oeste
-int contadorCarrosEste=0; //Contador de carros creados en el este
-int contadorCarrosOeste=0; //Contador de carros creados en el oeste
+void probaAmbulancia(int cantidad,int totalCarros, int* array);
+//calcula la cantidad de ambulacias en Este
+int cantidadAmbulanciasEste(); 
+//calcula la cantidad de ambulacias en Oeste
+int cantidadAmbulanciasOeste();
+//Contador de carros creados en el este
+int contadorCarrosEste=0; 
+//Contador de carros creados en el oeste
+int contadorCarrosOeste=0; 
+//crea los carros para sentido este-oeste
+void* CCOE(void* p);
+//crea los carros para sentido oeste-este 
+void* CCEO(void* p);
+//arreglo ambulancias este-oeste
+int *arraye_o;
+//arreglo ambulancias oeste-este 
+int *arrayo_e;
+//inicializa las ambulancias oeste-este
+void init_ambulanciasOE();
+//inicializa las ambulancias este-oeste
+void init_ambulanciasEO();
+//hilos de direccion
+pthread_t OE;
+pthread_t EO;
+void bloquea(int o);
 
 int main(){
 FILE* fp;
 char* filename="config.txt";
-read(fp, filename, arreglo);
-for(int i=0; i<18; i++){
-        printf("%lu", arreglo[i]);
-        printf("\n");
-}
-printf("\n");
-printf("\n");
-asignavalores(arreglo);
-printf("%lu", longitudpuente);
-printf("\n");
-printf("%lu", arreglo[0]);
-printf("\n");
+read_txt(fp, filename, arreglo);
+crearpuente();
+pthread_create(&OE, NULL, carroOE, NULL);
+//pthread_create(&EO, NULL, CCEO, NULL);
+pthread_join(OE, NULL);
+//pthread_join(EO, NULL);
 
 }
 
@@ -61,6 +77,7 @@ return ( (float) (rand()%10000) / 10000  );
 void crearpuente(){
 for(int i=0; i<arreglo[0]; i++){
 pthread_mutex_t s;
+printf("ok");
 pthread_mutex_init(&s, NULL);
 puente[i] = s;
         }
@@ -70,9 +87,8 @@ void* carroEO(void* p){
 contadorCarrosEste++;
 bool esAmbulancia=false;
 int cantidadAmbulancias=cantidadAmbulanciasEste();
-int * array=probaAmbulancia(cantidadAmbulanciasEste(),arreglo[3])
 for(int i=0; i<cantidadAmbulancias;i++){
-        if(contadorCarrosEste==array[i]){
+        if(contadorCarrosEste==arraye_o[i]){
                 esAmbulancia=true;
                 break;
         }
@@ -82,30 +98,44 @@ int velocidad = calculavelocidad(arreglo[6],arreglo[7]);
 pthread_mutex_lock(&puente[0]);
 for(int i=1;i<arreglo[0];i++){
 pthread_mutex_lock(&puente[i]);
+printf("soy carro y voy por la posicion %d",i);
 pthread_mutex_unlock(&puente[i-1]);
-nanosleep(1/velocidad);
+time_t sec= (time_t) 1/velocidad;
+usleep(sec);
         }
 }
 
 void* carroOE(void* p){
-contadorCarrosOeste++;
+/*contadorCarrosOeste++;
 bool esAmbulancia=false;
 int cantidadAmbulancias=cantidadAmbulanciasOeste();
-int* array=probaAmbulancia(cantidadAmbulancias,arreglo[11]);
 for(int i=0;i<cantidadAmbulancias; i++){
-        if(array[i]==contadorCarrosOeste){
+        if(arrayo_e[i]==contadorCarrosOeste){
          esAmbulancia=true;
          break;
         }
-}        
+}     */   
 int modo= arreglo[1];
 int velocidad = calculavelocidad(arreglo[14],arreglo[15]);
 pthread_mutex_lock(&puente[0]);
-for(int i=1;i<arreglo[0];i++){
-pthread_mutex_lock(&puente[i]);
-pthread_mutex_unlock(&puente[i-1]);
-nanosleep(1/velocidad);
-        }
+//for(int i=1;i<arreglo[0];i++){
+//pthread_mutex_unlock(&puente[i-1]);
+//pthread_mutex_lock(&puente[i]);
+//printf("soy carro y voy por la posicion %d",i);
+//time_t sec= (time_t) 1/velocidad;
+//usleep(0.5);
+       // }
+int i=1;
+while(i<arreglo[0]){
+pthread_mutex_unlock(&puente[0]);
+//pthread_mutex_lock(&puente[i]);
+usleep(1);
+//pthread_mutex_unlock(&puente[i-1]);
+//pthread_mutex_lock(&puente[i]);
+printf("soy carro y voy por la posicion %d",i);
+//time_t sec= (time_t) 1/velocidad;
+i++;
+}
 }
 
 int calculavelocidad(int vmax, int vmin){
@@ -122,8 +152,8 @@ int cantidadAmbulanciasOeste(){
       return (int)arreglo[17]*100 /arreglo[11];  
 }
 
-int* probaAmbulancia(int cantidadAmbu,int totalCarros){
- int array[cantidadAmbu];
+void probaAmbulancia(int cantidadAmbu,int totalCarros, int* array){
+ array[cantidadAmbu];
  srand(time(NULL));
  int rangoReal=(int)totalCarros/cantidadAmbu;
  int rangoVariable;
@@ -137,14 +167,45 @@ int* probaAmbulancia(int cantidadAmbu,int totalCarros){
   numero=(int)rand() % rangoVariable + (numero+1);
   array[i]=numero;
  }
- return array;
 }
 
+void* CCEO(void* p){
+        init_ambulanciasEO();
+        int cant = arreglo[3];
+        while(cant!=0){
+                pthread_t carro;
+pthread_create(&carro, NULL, carroEO, NULL);
+time_t sec= (time_t) 1/formula(arreglo[4]);
+usleep(sec);
+pthread_join(carro, NULL);
+cant--;
+}
+}
 
+void* CCOE(void* p){
+        init_ambulanciasEO();
+        int cant = arreglo[11];
+        while(cant!=0){
+                pthread_t carro;
+pthread_create(&carro, NULL, carroOE, NULL);
+time_t sec= (time_t) 1/formula(arreglo[12]);
+usleep(sec);
+pthread_join(carro, NULL);
+cant--;
+}
+}
 
-
-
-
+void init_ambulanciasEO(){
+probaAmbulancia(cantidadAmbulanciasEste(),arreglo[3], arraye_o);
+}
+void int_ambulanciasOE(){
+ probaAmbulancia(cantidadAmbulanciasOeste(),arreglo[11],arrayo_e );
+}
+ void bloquea(int o){
+pthread_mutex_unlock(&puente[o-1]);
+pthread_mutex_lock(&puente[o]);
+printf("soy carro y voy por la posicion %d",o);
+ }
 
 /* FILE* fp;
         char* filename="config.txt";
@@ -174,3 +235,14 @@ char str[MAX];
 //time_t t;
   //      srand((unsigned) time(&t));
 //printf("%d", (rand()%100));
+
+/*for(int i=0; i<18; i++){
+        printf("%lu", arreglo[i]);
+        printf("\n");
+}
+printf("\n");
+printf("\n");
+printf("%lu", longitudpuente);
+printf("\n");
+printf("%lu", arreglo[0]);
+printf("\n");*/

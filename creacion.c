@@ -17,9 +17,9 @@ size_t velomaxima2;
 size_t cvpp2;
 size_t ambulancias2;
 
-void asignavalores (size_t * arreglo){
-size_t longitudpuente = &arreglo[0];
-/*size_t modoejecucion = arreglo[1];
+/*void asignavalores (size_t * arreglo){
+size_t longitudpuente = arreglo[0];
+size_t modoejecucion = arreglo[1];
 //datos del este
 size_t cantidaddecarros1 = arreglo[3];
 size_t promediollegada1 = arreglo[4];
@@ -35,5 +35,5 @@ size_t tiempodelsemaforo2=arreglo[13];
 size_t velominima2= arreglo[14];
 size_t velomaxima2= arreglo[15];
 size_t cvpp2=arreglo[16];
-size_t ambulancias2= arreglo[17];*/
-}
+size_t ambulancias2= arreglo[17];
+}*/
