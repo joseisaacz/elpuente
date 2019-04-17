@@ -1,6 +1,6 @@
 #define MAX 100
 
-void read(FILE *file, char* name, size_t *arreglo){
+void read_txt(FILE *file, char* name, size_t *arreglo){
     file= fopen(name, "r");
                 char str[MAX];
                 file= fopen(name, "r");
