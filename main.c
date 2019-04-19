@@ -25,7 +25,7 @@ void* carroOE(void* p);
 //devuelve un random entre los parametros ingresados
 int calculavelocidad(int vmax, int vmin);
 //calcula si es ambulancia 
-void probaAmbulancia(int cantidad,int totalCarros, int* array);
+void probaAmbulancia(int cantidad,int totalCarros, int array[]);
 //calcula la cantidad de ambulacias en Este
 int cantidadAmbulanciasEste(); 
 //calcula la cantidad de ambulacias en Oeste
@@ -56,6 +56,8 @@ FILE* fp;
 char* filename="config.txt";
 read_txt(fp, filename, arreglo);
 crearpuente();
+arrayo_e=(int*)malloc(sizeof(int)*cantidadAmbulanciasOeste());
+arraye_o=(int*)malloc(sizeof(int)*cantidadAmbulanciasEste());
 pthread_create(&OE, NULL, carroOE, NULL);
 //pthread_create(&EO, NULL, CCEO, NULL);
 pthread_join(OE, NULL);
@@ -105,7 +107,8 @@ usleep(sec);
 }
 
 void* carroOE(void* p){
-/*contadorCarrosOeste++;
+init_ambulanciasOE();        
+contadorCarrosOeste++;
 bool esAmbulancia=false;
 int cantidadAmbulancias=cantidadAmbulanciasOeste();
 for(int i=0;i<cantidadAmbulancias; i++){
@@ -113,7 +116,7 @@ for(int i=0;i<cantidadAmbulancias; i++){
          esAmbulancia=true;
          break;
         }
-}     */   
+}     
 int modo= arreglo[1];
 int velocidad = calculavelocidad(arreglo[14],arreglo[15]);
 pthread_mutex_lock(&puente[0]);
@@ -152,21 +155,23 @@ int cantidadAmbulanciasOeste(){
       return (int)arreglo[17]*100 /arreglo[11];  
 }
 
-void probaAmbulancia(int cantidadAmbu,int totalCarros, int* array){
- array[cantidadAmbu];
+void probaAmbulancia(int cantidadAmbu,int totalCarros, int array[]){
+ 
  srand(time(NULL));
  int rangoReal=(int)totalCarros/cantidadAmbu;
  int rangoVariable;
  int numero=0;
  int i=0;
+ int aux=0;
  for(i; i<cantidadAmbu; i++){
   rangoVariable=numero+rangoReal;
   if(rangoVariable>totalCarros)
         rangoVariable=totalCarros;
-
-  numero=(int)rand() % rangoVariable + (numero+1);
+  aux=numero+1;    
+  numero=(int)rand() % (rangoVariable-aux) + aux;
   array[i]=numero;
  }
+ printf("hola");
 }
 
 void* CCEO(void* p){
@@ -198,7 +203,7 @@ cant--;
 void init_ambulanciasEO(){
 probaAmbulancia(cantidadAmbulanciasEste(),arreglo[3], arraye_o);
 }
-void int_ambulanciasOE(){
+void init_ambulanciasOE(){
  probaAmbulancia(cantidadAmbulanciasOeste(),arreglo[11],arrayo_e );
 }
  void bloquea(int o){
