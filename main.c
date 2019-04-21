@@ -2,11 +2,13 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <stdbool.h>
-#include<unistd.h>
+#include <unistd.h>
 #include "creacion.c"
 #include "read.c"
 #include <math.h>
 #include <time.h>
+int cant;
+#define PTHREAD_COND_INITIALIZER {{0}}
 //datos de configuracion
 size_t arreglo[]={};
 //arreglo de  mutex recurso compartido 
@@ -49,6 +51,27 @@ void init_ambulanciasEO();
 //hilos de direccion
 pthread_t OE;
 pthread_t EO;
+//mutex para fuerza bruta 
+pthread_mutex_t fuerzabruta;
+pthread_t fb0;
+pthread_t fb1;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+void bloqueaf(){
+        pthread_mutex_lock(&fuerzabruta);
+}
+void desbloqueaf(){
+        pthread_mutex_unlock(&fuerzabruta);
+}
+void *fuerzabruta_method1(void *p ){
+bloqueaf();
+pthread_create(&OE, NULL, CCOE, NULL);
+desbloqueaf();
+}
+void *fuerzabruta_method2(void* p){
+bloqueaf();
+pthread_create(&OE, NULL, CCOE, NULL);
+desbloqueaf();
+}
 void bloquea(int o);
 
 int main(){
@@ -58,10 +81,16 @@ read_txt(fp, filename, arreglo);
 crearpuente();
 arrayo_e=(int*)malloc(sizeof(int)*cantidadAmbulanciasOeste());
 arraye_o=(int*)malloc(sizeof(int)*cantidadAmbulanciasEste());
-pthread_create(&OE, NULL, carroOE, NULL);
-//pthread_create(&EO, NULL, CCEO, NULL);
+pthread_create(&OE, NULL, CCOE, NULL);
+pthread_create(&EO, NULL, CCEO, NULL);
 pthread_join(OE, NULL);
-//pthread_join(EO, NULL);
+pthread_join(EO, NULL);
+if (cant!= 0){
+        
+        pthread_cond_wait(&cond, &puente[arreglo[0]-1]);
+}else{
+        pthread_cond_signal(&cond);
+}
 
 }
 
@@ -79,7 +108,7 @@ return ( (float) (rand()%10000) / 10000  );
 
 void crearpuente(){
 for(int i=0; i<arreglo[0]; i++){
-printf("%ld", arreglo[0]);
+//printf("%ld", arreglo[0]);
 pthread_mutex_init(&puente[i], NULL);
         }
 }
@@ -88,26 +117,32 @@ void* carroEO(void* p){
 contadorCarrosEste++;
 bool esAmbulancia=false;
 int cantidadAmbulancias=cantidadAmbulanciasEste();
-for(int i=0; i<cantidadAmbulancias;i++){
-        if(contadorCarrosEste==arraye_o[i]){
-                esAmbulancia=true;
-                break;
+for(int i=0;i<cantidadAmbulancias; i++){
+        if(arrayo_e[i]==contadorCarrosEste){
+         esAmbulancia=true;
+         break;
         }
-}       
+}     
 int modo= arreglo[1];
-int velocidad = calculavelocidad(arreglo[6],arreglo[7]);
+int velocidad = calculavelocidad(arreglo[7],arreglo[]);
 pthread_mutex_lock(&puente[0]);
-for(int i=1;i<arreglo[0];i++){
+int i=1;
+while(i<arreglo[0]){
 pthread_mutex_lock(&puente[i]);
-printf("soy carro y voy por la posicion %d",i);
 pthread_mutex_unlock(&puente[i-1]);
+if(esAmbulancia){
+        printf("soy ambulancia y voy por la posicion %d", i);
+}/*else {
+printf("soy carro y voy por la posicion %d",i);
+}*/
+printf("\n");
 time_t sec= (time_t) 1/velocidad;
 usleep(sec);
+i++;
         }
 }
 
-void* carroOE(void* p){
-init_ambulanciasOE();        
+void* carroOE(void* p){    
 contadorCarrosOeste++;
 bool esAmbulancia=false;
 int cantidadAmbulancias=cantidadAmbulanciasOeste();
@@ -120,23 +155,18 @@ for(int i=0;i<cantidadAmbulancias; i++){
 int modo= arreglo[1];
 int velocidad = calculavelocidad(arreglo[14],arreglo[15]);
 pthread_mutex_lock(&puente[0]);
-//for(int i=1;i<arreglo[0];i++){
-//pthread_mutex_unlock(&puente[i-1]);
-//pthread_mutex_lock(&puente[i]);
-//printf("soy carro y voy por la posicion %d",i);
-//time_t sec= (time_t) 1/velocidad;
-//usleep(0.5);
-       // }
 int i=1;
 while(i<arreglo[0]){
-//pthread_mutex_unlock(&puente[0]);
 pthread_mutex_lock(&puente[i]);
-usleep(1);
 pthread_mutex_unlock(&puente[i-1]);
-//pthread_mutex_lock(&puente[i]);
+if(esAmbulancia){
+        printf("soy ambulancia y voy por la posicion %d", i);
+}/*else {
 printf("soy carro y voy por la posicion %d",i);
+}*/
 printf("\n");
-//time_t sec= (time_t) 1/velocidad;
+time_t sec= (time_t) 1/velocidad;
+usleep(sec);
 i++;
 }
 }
@@ -162,7 +192,7 @@ void probaAmbulancia(int cantidadAmbu,int totalCarros, int array[]){
  int rangoVariable;
  int numero=0;
  int i=0;
- int aux=0;
+ int aux=0;   
  for(i; i<cantidadAmbu; i++){
   rangoVariable=numero+rangoReal;
   if(rangoVariable>totalCarros)
@@ -171,7 +201,7 @@ void probaAmbulancia(int cantidadAmbu,int totalCarros, int array[]){
   numero=(int)rand() % (rangoVariable-aux) + aux;
   array[i]=numero;
  }
- printf("hola");
+ //printf("hola");
 }
 
 void* CCEO(void* p){
@@ -182,20 +212,19 @@ void* CCEO(void* p){
 pthread_create(&carro, NULL, carroEO, NULL);
 time_t sec= (time_t) 1/formula(arreglo[4]);
 usleep(sec);
-pthread_join(carro, NULL);
 cant--;
 }
 }
 
 void* CCOE(void* p){
-        init_ambulanciasEO();
+       init_ambulanciasOE();
         int cant = arreglo[11];
         while(cant!=0){
                 pthread_t carro;
 pthread_create(&carro, NULL, carroOE, NULL);
 time_t sec= (time_t) 1/formula(arreglo[12]);
 usleep(sec);
-pthread_join(carro, NULL);
+//pthread_join(carro, NULL);
 cant--;
 }
 }
