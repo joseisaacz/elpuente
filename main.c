@@ -2,11 +2,15 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <stdbool.h>
-#include<unistd.h>
+#include <unistd.h>
 #include "creacion.c"
 #include "read.c"
 #include <math.h>
 #include <time.h>
+<<<<<<< HEAD
+int cant;
+#define PTHREAD_COND_INITIALIZER {{0}}
+=======
  
 
 /* STATE_A = THREAD A runs next, STATE_B = THREAD B runs next */
@@ -23,6 +27,7 @@ int cantCarrosenPuente=0;
 int Esperando[2];
 pthread_cond_t EsteOeste[2];
 
+>>>>>>> e72794b545ff2dc27002b3ca970e04404f3dbc5e
 //datos de configuracion
 //Contador de carros creados en el este
 int vcontadorCarrosEste=0; 
@@ -66,7 +71,31 @@ int cant;
  int cant2;
 pthread_t OE;
 pthread_t EO;
+<<<<<<< HEAD
+//mutex para fuerza bruta 
+pthread_mutex_t fuerzabruta;
+pthread_t fb0;
+pthread_t fb1;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+void bloqueaf(){
+        pthread_mutex_lock(&fuerzabruta);
+}
+void desbloqueaf(){
+        pthread_mutex_unlock(&fuerzabruta);
+}
+void *fuerzabruta_method1(void *p ){
+bloqueaf();
+pthread_create(&OE, NULL, CCOE, NULL);
+desbloqueaf();
+}
+void *fuerzabruta_method2(void* p){
+bloqueaf();
+pthread_create(&OE, NULL, CCOE, NULL);
+desbloqueaf();
+}
+=======
 pthread_mutex_t  MonitorLock;
+>>>>>>> e72794b545ff2dc27002b3ca970e04404f3dbc5e
 void bloquea(int o);
 //arreglo ambulancias este-oeste
 int *arraye_o;
@@ -105,13 +134,24 @@ char* filename="config.txt";
 read_txt(fp, filename, arreglo);
 arrayo_e=(int*)malloc(sizeof(int)*cantidadAmbulanciasOeste());
 arraye_o=(int*)malloc(sizeof(int)*cantidadAmbulanciasEste());
+<<<<<<< HEAD
+pthread_create(&OE, NULL, CCOE, NULL);
+pthread_create(&EO, NULL, CCEO, NULL);
+=======
 crearpuente();
 
 
 pthread_create(&OE, NULL,crearCarro , NULL);
 //pthread_create(&EO, NULL, CCEO, NULL);
+>>>>>>> e72794b545ff2dc27002b3ca970e04404f3dbc5e
 pthread_join(OE, NULL);
-//pthread_join(EO, NULL);
+pthread_join(EO, NULL);
+if (cant!= 0){
+        
+        pthread_cond_wait(&cond, &puente[arreglo[0]-1]);
+}else{
+        pthread_cond_signal(&cond);
+}
 
 }
 
@@ -147,9 +187,33 @@ vcontadorCarrosEste++;
 bool esAmbulancia=false;
 int cantidadAmbulancias=cantidadAmbulanciasEste();
 for(int i=0;i<cantidadAmbulancias; i++){
+<<<<<<< HEAD
+        if(arrayo_e[i]==contadorCarrosEste){
+         esAmbulancia=true;
+         break;
+        }
+}     
+int modo= arreglo[1];
+int velocidad = calculavelocidad(arreglo[7],arreglo[]);
+pthread_mutex_lock(&puente[0]);
+int i=1;
+while(i<arreglo[0]){
+pthread_mutex_lock(&puente[i]);
+pthread_mutex_unlock(&puente[i-1]);
+if(esAmbulancia){
+        printf("soy ambulancia y voy por la posicion %d", i);
+}/*else {
+printf("soy carro y voy por la posicion %d",i);
+}*/
+printf("\n");
+time_t sec= (time_t) 1/velocidad;
+usleep(sec);
+i++;
+=======
         if(arraye_o[i]==vcontadorCarrosEste){
          esAmbulancia=true;
          break;
+>>>>>>> e72794b545ff2dc27002b3ca970e04404f3dbc5e
         }
 }     
 //int modo= arreglo[1];
@@ -179,9 +243,13 @@ int velocidad = calculavelocidad(arreglo[7],arreglo[8]);
 // }
 }
 
+<<<<<<< HEAD
+void* carroOE(void* p){    
+=======
 void* carroOE(void * p){
 //init_ambulanciasOE();  
 //printf("Creando carro OE\n");      
+>>>>>>> e72794b545ff2dc27002b3ca970e04404f3dbc5e
 contadorCarrosOeste++;
 bool esAmbulancia=false;
 int cantidadAmbulancias=cantidadAmbulanciasOeste();
@@ -193,6 +261,23 @@ for(int i=0;i<cantidadAmbulancias; i++){
 }     
 //int modo= arreglo[1];
 int velocidad = calculavelocidad(arreglo[14],arreglo[15]);
+<<<<<<< HEAD
+pthread_mutex_lock(&puente[0]);
+int i=1;
+while(i<arreglo[0]){
+pthread_mutex_lock(&puente[i]);
+pthread_mutex_unlock(&puente[i-1]);
+if(esAmbulancia){
+        printf("soy ambulancia y voy por la posicion %d", i);
+}/*else {
+printf("soy carro y voy por la posicion %d",i);
+}*/
+printf("\n");
+time_t sec= (time_t) 1/velocidad;
+usleep(sec);
+i++;
+}
+=======
 //pthread_mutex_lock(&puente[0]);
 if(esAmbulancia)
 printf("Soy una ambulanciaOE y vengo a esta velocidad:%d \n",velocidad);
@@ -216,6 +301,7 @@ printf("Soy un CarroOE y vengo a esta velocidad:%d \n",velocidad);
 // printf("\n");
 // }
 
+>>>>>>> e72794b545ff2dc27002b3ca970e04404f3dbc5e
 }
 
 int calculavelocidad(int vmax, int vmin){
@@ -240,7 +326,7 @@ void probaAmbulancia(int cantidadAmbu,int totalCarros, int array[]){
  int rangoVariable;
  int numero=0;
  int i=0;
- int aux=0;
+ int aux=0;   
  for(i; i<cantidadAmbu; i++){
   rangoVariable=numero+rangoReal;
   if(rangoVariable>totalCarros)
@@ -258,14 +344,30 @@ void* CCEO(void * p){
         while(cant!=0){
                 pthread_t carro;
 pthread_create(&carro, NULL, carroEO, NULL);
+<<<<<<< HEAD
+time_t sec= (time_t) 1/formula(arreglo[4]);
+usleep(sec);
+=======
 //time_t sec= (time_t) 1/(int)formula(arreglo[4]);
 //usleep(sec);
 //pthread_join(carro, NULL);
+>>>>>>> e72794b545ff2dc27002b3ca970e04404f3dbc5e
 cant--;
 }
 }
 
 void* CCOE(void* p){
+<<<<<<< HEAD
+       init_ambulanciasOE();
+        int cant = arreglo[11];
+        while(cant!=0){
+                pthread_t carro;
+pthread_create(&carro, NULL, carroOE, NULL);
+time_t sec= (time_t) 1/formula(arreglo[12]);
+usleep(sec);
+//pthread_join(carro, NULL);
+cant--;
+=======
         init_ambulanciasOE();
          cant2 = arreglo[11];
         while(cant2!=0){
@@ -275,6 +377,7 @@ pthread_create(&carro, NULL, carroOE, NULL);
 //usleep(sec);
 //pthread_join(carro, NULL);
 cant2--;
+>>>>>>> e72794b545ff2dc27002b3ca970e04404f3dbc5e
 }
 }
 
