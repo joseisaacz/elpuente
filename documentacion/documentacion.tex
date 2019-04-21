@@ -1,13 +1,9 @@
 \documentclass[10pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
-\usepackage[latin1]{inputenc}
-\usepackage[spanish]{inputenc}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{graphicx}
+\usepackage[spanish]{babel}
+\usepackage{textcomp}
 \usepackage[left=2cm,right=2cm,top=3cm,bottom=2cm]{geometry}
-\author{José Isaac Zeledón Jiménez }
+\author{José Isaac Zeledón Jiménez, Jonathan Estrada Vargas}
 \title{Proyecto 0}
 \begin{document}
 \begin{titlepage}
@@ -51,19 +47,39 @@ I CICLO\\
 2019
 \end{center}
 \end{titlepage}
+\tableofcontents
+\pagebreak
 \section{Introducción}
 	Este documento tiene como proposito describir el problema planteado por el profesor, los maneras de abordar este problema y de como resolverlo, los problemas que se afrotaron a la hora de desarrollar la solucion, ademas de las posibles soluciones a los que no se les pudo dar una solucion.\\
 De esta manera se puede documentar el proceso de aprendizaje, ademas de dar a concocer las fortalezas y debilidades de los participantes, para asi conocer las areas que el equipo de trabajo debe de reforzar para asi poseer un mejor dominio de los temas que competen a la solucion de este proyecto y sobre todo a el dominio de las habilidades necesarias para la finalizacion del curso de Sistemas Operativos.\\
 \section{Descripción del Problema}
-El problema que el profesor nos brindo fue el de un problema recurrente en las calles de nuestro pais, lo cual es que en ciertas  carreteras al llegar a un puente, este es del ancho de un automovil lo que causa que solo pueda pasar un auto por sentido. 
-Esto genera el problema, de que se deba de encontrar la manera de gestionar el flujo del transito.
-
+El problema que el profesor nos brindó fue el de un problema recurrente en las calles de nuestro pais, lo cual es que en ciertas  carreteras al llegar a un puente, este es del ancho de un automovil. Este problema trae como consecuencia de que solo puedan por pasar carros por un sentido, en este caso de Oeste a Este o de Este a Oeste.\\
+Este caso genera, que se deba de encontrar la manera de gestionar el flujo del transito, para asi asegurar el funcionamiento del puente, para evitar que pasen carros de sentidos opuestos y el uso del puente no quede bloqueado.\\ 
 Asi que se requirio el desarrollo de una simulacion para representar la situacion del flujo de transito por el puente de una sola via, consistia en representar 3 posibles situaciones que se pueden presentar a la hora de controlar el flujo de los autos. 
 \begin{itemize}
 \item La tecnica de fuerza bruta.
 \item Semaforo
 \item Oficial de Transito 
 \end{itemize}
-
+La tecnica fuerza bruta, es la que en la vida real puede representar, que exista una señalización de ceda en uno de los lados del puente así que los autos de un sentido específico deben de esperar a que los del otro sentido hayan pasado por completo.\\\\
+Semáforo representa la situación de que en el puente, existan semáforos en cada sentido.\\\\
+Oficial de Tránsito representa la situación de que se coloquen en los sentidos del puente oficiales, para regular el transito en los distintos sentidos.
+\section{Especificacion de la solución}
+	En esta sección se detallará el cómo se intentó dar solución a los problemas planteados por el enunciado. 
+\subsection{Descripción de los Recursos Compartidos}
+	Para la solución de este problema se uitlizaron varios recursos compartidos que se fueron de ayuda para la comunicacion entre procesos, definir los datos de configuracion de los hilos de ejecucion que el Sistema Operativo crearía durante la ejecución de la simulación.\\
+A continaución se enumerarán los recursos compartidos definidos en la solucion que se presentó.\\
+\begin{enumerate}
+\item  pthread\_ cond\_ t      condA  = PTHREAD\_ COND\_ INITIALIZER; 
+\item  pthread\_ cond\_ t      condB  = PTHREAD\_ COND\_ INITIALIZER;
+\item char* direccionCarros;
+\item char * direccionPuente;
+\item int contadorCarosEO=0;
+\item int contadorCarosOE=0;
+\item int direccion;
+\item int cantCarrosenPuente=0;
+\item int Esperando[2];
+\item pthread\_ cond\_ t EsteOeste[2];
+\end{enumerate}
 \end{document}
 \end{document}
