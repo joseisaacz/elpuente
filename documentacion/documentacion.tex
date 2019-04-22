@@ -70,16 +70,35 @@ Oficial de Tránsito representa la situación de que se coloquen en los sentidos
 	Para la solución de este problema se uitlizaron varios recursos compartidos que se fueron de ayuda para la comunicacion entre procesos, definir los datos de configuracion de los hilos de ejecucion que el Sistema Operativo crearía durante la ejecución de la simulación.\\
 A continaución se enumerarán los recursos compartidos definidos en la solucion que se presentó.\\
 \begin{enumerate}
-\item  pthread\_ cond\_ t      condA  = PTHREAD\_ COND\_ INITIALIZER; 
-\item  pthread\_ cond\_ t      condB  = PTHREAD\_ COND\_ INITIALIZER;
+\item pthread\_cond\_t      condA  = PTHREAD\_COND\_INITIALIZER; 
+\item pthread\_cond\_t      condB  = PTHREAD\_COND\_INITIALIZER;
 \item char* direccionCarros;
 \item char * direccionPuente;
 \item int contadorCarosEO=0;
 \item int contadorCarosOE=0;
-\item int direccion;
+\item int direccion; 
 \item int cantCarrosenPuente=0;
 \item int Esperando[2];
-\item pthread\_ cond\_ t EsteOeste[2];
+\item pthread\_cond\_t EsteOeste[2];
+\item int contadorCarrosOeste = 0;
+\item int contadorCarrosEste = 0;
+\item pthread\_mutex\_t puente[10];
+\item pthread\_t OE;
+\item pthread\_mutex\_t MonitorLock;
+\item int *arraye\_o;
+\item int *arrayo\_e;
+\item size\_t arreglo[] = {};
 \end{enumerate}
+Los recursos 1 y 2 son declarados para hacer el control de los carros que van a quedar bloqueados por el hecho de ser de una dirección contraria a la dirección que posee la vía.\\\\
+Los recursos 3 y 4 son utilizados más que todo para el manejo de la impresión en consola de datos de la simulación.\\\\
+Los recursos 5 y 6 son numeros enteros que representan los carros creados, estos dos contadores son los utilizados para llevar un control de los carros por sentido y así cumplir con la cantidad que llegue espeficicada en los datos de configuración.\\\\
+El recurso 7 es utilizado para darle un valor numerico a la dirección de un flujo de tránsito.\\\\
+El recurso 8 se emplea para tener el conocimiento de los carros que se encuentran cruzando el puente esto con el fin de evitar que el hilos de ejecución que representan el flujo de tránsito de la otra dirección inicien sin antes haber terminado el flujo que posee la vía, este es uno de los recurso que se empleo para evitar el deadlock en la simulación.\\\\
+El recurso 9 es un arreglo de enteros de 2 posiciones que es uilizado en la condición que maneja el bloqueo de los hilos que se encuentran esperando para utilizar el puente, osea se utiliza para manejar los flujos en los distintos sentidos Este-Oeste o Oeste-Este.\\\\
+El recurso 10 se relaciona con el recurso 9, ya que esos cond\_t son los que bloquean los flujos de los diferentes sentidos.\\\\
+Los recursos 11 y 12 son otros contadores de los carros por sentido, pero estos son utilizados en la asignación de las ambulancias por cada sentido, segun los datos de configuración de cada sentido.\\\\
+El recurso 13 es un arreglo de mutex, el cuál representa el principal recurso de esta simulación, el puente, este mismo es el que los hilos de ejecución de cada sentido "pasen por él".\\\\
+El recurso 14 es un pthread\_t que es el hilo que posteriormente se crea como el hilo principal de ejecucion en el cuál corre el metodo principal de la simulación.\\
+
 \end{document}
 \end{document}
