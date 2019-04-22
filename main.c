@@ -122,7 +122,8 @@ pthread_mutex_init(&puente[i], NULL);
         }
 }
 
-void* carroEO(void * p){    
+void* carroEO(void * p){
+    
 vcontadorCarrosEste++;
 bool esAmbulancia=false;
 int cantidadAmbulancias=cantidadAmbulanciasEste();
