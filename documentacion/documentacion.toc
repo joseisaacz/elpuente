@@ -1,0 +1,5 @@
+\babel@toc {spanish}{}
+\contentsline {section}{\numberline {1}Introducci\IeC {\'o}n}{2}
+\contentsline {section}{\numberline {2}Descripci\IeC {\'o}n del Problema}{2}
+\contentsline {section}{\numberline {3}Especificacion de la soluci\IeC {\'o}n}{2}
+\contentsline {subsection}{\numberline {3.1}Descripci\IeC {\'o}n de los Recursos Compartidos}{2}
