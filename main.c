@@ -175,7 +175,7 @@ int cantidadAmbulanciasEste()
 }
 int cantidadAmbulanciasOeste()
 {
-        return (int)arreglo[17] * arreglo[11] / 100;
+        return (int)arreglo[17] * arreglo[11] / 100;puente
 }
 
 void probaAmbulancia(int cantidadAmbu, int totalCarros, int array[])
