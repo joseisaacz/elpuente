@@ -9,13 +9,7 @@
 #include <time.h>
  
 
-/* STATE_A = THREAD A runs next, STATE_B = THREAD B runs next */
-enum { STATE_A, STATE_B } state = STATE_A;
-pthread_cond_t      condA  = PTHREAD_COND_INITIALIZER;
-pthread_cond_t      condB  = PTHREAD_COND_INITIALIZER;
 
-char* direccionCarros;
-char * direccionPuente;
 int contadorCarosEO=0;
 int contadorCarosOE=0;
 int direccion;
@@ -49,55 +43,41 @@ void probaAmbulancia(int cantidad,int totalCarros, int array[]);
 int cantidadAmbulanciasEste(); 
 //calcula la cantidad de ambulacias en Oeste
 int cantidadAmbulanciasOeste();
-//crea los carros para sentido este-oeste
-void* CCOE(void* p);
-//crea los carros para sentido oeste-este 
-void* CCEO(void* p);
 //inicializa las ambulancias oeste-este
 void init_ambulanciasOE();
 //inicializa las ambulancias este-oeste
 void init_ambulanciasEO();
-//hilos de direccion
+//funcion que verifica si es seguro pasar el puente
 int esSeguro(int dir);
+//pasa por el puente
 void  LlegaApuente(int dir);
+//carro sale del puente
 void salePuente(int dir);
-int contador=0;
+//cantidad de carros sentido Este-Oeste
 int cant;
- int cant2;
+//cantidad de carros sentido Oeste-Este 
+int cant2;
+//hilo
 pthread_t OE;
+//hilo
 pthread_t EO;
-pthread_mutex_t  MonitorLock;
-void bloquea(int o);
 //arreglo ambulancias este-oeste
 int *arraye_o;
 //arreglo ambulancias oeste-este 
 int *arrayo_e;
+//arreglo principal donde se almacenan los datos
 size_t arreglo[]={};
+//funcion que bloquea el puenre
 void bloquearPuente();
+//funcion que desbloquea el puente
 void desbloquearPuente();
+//funcion que crea los carros como hilos
 void * crearCarro(void * p);
-char * dir(int dir);
 
-// pthread_mutex_t fuerzabruta;
-// pthread_t fb0;
-// pthread_t fb1;
-// pthread_cond_t cond;
-// void bloqueaf(){
-//         pthread_mutex_lock(&fuerzabruta);
-// }
-// void desbloqueaf(){
-//         pthread_mutex_unlock(&fuerzabruta);
-// }
-// void *fuerzabruta_method1(void *p ){
-// bloqueaf();
-// pthread_create(&OE, NULL, CCOE, NULL);
-// desbloqueaf();
-// }
-// void* fuerzabruta_method2(void* p){
-// bloqueaf();
-// pthread_create(&EO, NULL, CCEO, NULL);
-// desbloqueaf();
-// }
+
+
+
+
 
 int main(){
 FILE* fp;
@@ -114,6 +94,9 @@ pthread_join(OE, NULL);
 //pthread_join(EO, NULL);
 
 }
+
+
+
 
 
 float formula(int promedio){
@@ -135,14 +118,11 @@ void crearpuente(){
         pthread_cond_init(&(EsteOeste[1]),NULL);
         
 for(int i=0; i<arreglo[0]; i++){
-//printf("%ld", arreglo[0]);
 pthread_mutex_init(&puente[i], NULL);
         }
 }
 
-void* carroEO(void * p){
-//init_ambulanciasOE();  
-printf("Creando carro EO\n");     
+void* carroEO(void * p){    
 vcontadorCarrosEste++;
 bool esAmbulancia=false;
 int cantidadAmbulancias=cantidadAmbulanciasEste();
@@ -158,30 +138,10 @@ int velocidad = calculavelocidad(arreglo[7],arreglo[8]);
 // printf("Soy una ambulanciaEO y vengo a esta velocidad:%d \n",velocidad);
 // else
 // printf("Soy un CarroEO y vengo a esta velocidad:%d \n",velocidad);
-//pthread_mutex_lock(&puente[0]);
 
-// int i=1;
-// while(i<arreglo[0]){
-// //printf("Bloqueando y Desbloqueando EO\n");        
-// pthread_mutex_unlock(&puente[i-1]);   
-// usleep(1);    
-// pthread_mutex_lock(&puente[i]);
-
-
-//time_t sec= (time_t) 1/velocidad;
-// if(esAmbulancia)
-// printf("Soy ambulanciaEO y voy por la posicion %d",i);
-
-// printf("\n");
-//usleep(sec);
-// i++;
-
-// }
 }
 
-void* carroOE(void * p){
-//init_ambulanciasOE();  
-//printf("Creando carro OE\n");      
+void* carroOE(void * p){   
 contadorCarrosOeste++;
 bool esAmbulancia=false;
 int cantidadAmbulancias=cantidadAmbulanciasOeste();
@@ -193,28 +153,10 @@ for(int i=0;i<cantidadAmbulancias; i++){
 }     
 //int modo= arreglo[1];
 int velocidad = calculavelocidad(arreglo[14],arreglo[15]);
-//pthread_mutex_lock(&puente[0]);
 if(esAmbulancia)
 printf("Soy una ambulanciaOE y vengo a esta velocidad:%d \n",velocidad);
 else
 printf("Soy un CarroOE y vengo a esta velocidad:%d \n",velocidad);
-// int i=1;
-// while(i<arreglo[0]){   
-// if(mutex_is_locked())     
-// pthread_mutex_unlock(&puente[i-1]);  
-// usleep(1);
-// pthread_mutex_lock(&puente[i]);
-
-
-
-// //time_t sec= (time_t) 1/velocidad;
-// //usleep(sec);
-// i++;
-// if(esAmbulancia)
-// printf("Soy ambulancia y voy por la posicion %d",i);
-
-// printf("\n");
-// }
 
 }
 
@@ -249,33 +191,7 @@ void probaAmbulancia(int cantidadAmbu,int totalCarros, int array[]){
   numero=(int)rand() % (rangoVariable-aux) + aux;
   array[i]=numero;
  }
- //printf("hola");
-}
 
-void* CCEO(void * p){
-       init_ambulanciasEO();
-        cant = arreglo[3];
-        while(cant!=0){
-                pthread_t carro;
-pthread_create(&carro, NULL, carroEO, NULL);
-//time_t sec= (time_t) 1/(int)formula(arreglo[4]);
-//usleep(sec);
-//pthread_join(carro, NULL);
-cant--;
-}
-}
-
-void* CCOE(void* p){
-        init_ambulanciasOE();
-         cant2 = arreglo[11];
-        while(cant2!=0){
-                pthread_t carro;
-pthread_create(&carro, NULL, carroOE, NULL);
-//time_t sec= (time_t) 1/(int)formula(arreglo[12]);
-//usleep(sec);
-//pthread_join(carro, NULL);
-cant2--;
-}
 }
 
 void init_ambulanciasEO(){
@@ -298,9 +214,11 @@ void  LlegaApuente(int dir)
 {
      bloquearPuente();      
           if (!esSeguro(dir)) {
-               Esperando[dir]++;   
+               Esperando[dir]++; 
+               for(int i=0; i<arreglo[0]; i++){  
                while (!esSeguro(dir))    
-                    pthread_cond_wait(&(EsteOeste[dir]), &MonitorLock);
+                    pthread_cond_wait(&(EsteOeste[dir]), &puente[i]);
+               }
                Esperando[dir]--;  
           }
           cantCarrosenPuente++;           
@@ -390,119 +308,6 @@ char * dir(int dir){
         
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//  void bloquea(int o){
-// pthread_mutex_unlock(&puente[o-1]);
-// pthread_mutex_lock(&puente[o]);
-// printf("soy carro y voy por la posicion %d",o);
-//  }
-
-
-/*
-
-void* CCEO(void * p){
-       // printf("Funcion CCEO\n");
-       init_ambulanciasEO();
-        cant = arreglo[3];
-        while(cant!=0){
-
-  
-  for(int i=0; i<10; i++){
-        printf("Bloqueando sentido EO\n");
-        pthread_mutex_lock(&puente[i]);
-        while (state != STATE_A){
-        pthread_cond_wait(&condA, &puente[i]);
-          printf("Esperanto sentido EO\n");
-        }
-        pthread_mutex_unlock(&puente[i]);
-  }
-                pthread_t carro;
-
-pthread_create(&carro, NULL, carroEO, NULL);
-time_t sec= (time_t) 1/formula(arreglo[4]);
-pthread_join(carro,NULL);
-usleep(sec);
-
-for(int i=0;i<10;i++){
-printf("Desbloqueando sentido EO\n");
-  pthread_mutex_lock(&puente[i]);
-        state = STATE_B;
-        //pthread_cond_signal(&condB);
-        pthread_cond_broadcast(&condB);
-        pthread_mutex_unlock(&puente[i]);
-}
-//pthread_join(carro, NULL);
-cant--;
-}
-}
-
-
-void* CCOE(void* p){
-        //printf("Funcion CCOE\n");
-        init_ambulanciasOE();
-        cant2 = arreglo[11];
-        while(cant2!=0){
-          
-                 for(int i=0;i<10;i++){
-        printf("Bloqueando sentido OE\n");
-        pthread_mutex_lock(&puente[i]);
-        while (state != STATE_B){
-            pthread_cond_wait(&condB, &puente[i]);
-            printf("Esperanto sentido OE\n");
-            }
-        pthread_mutex_unlock(&puente[i]);
-                 }
-
-//Do stuff
-                pthread_t carro;
-pthread_create(&carro, NULL, carroOE, NULL);
-time_t sec= (time_t) 1/formula(arreglo[12]);
-usleep(sec);
-pthread_join(carro,NULL);
-
-
- for(int i=0;i<10;i++){
-         printf("Desbloqueando sentido OE\n");
-        pthread_mutex_lock(&puente[i]);
-        state = STATE_A;
-        pthread_cond_broadcast(&condA);
-        pthread_mutex_unlock(&puente[i]);
+void * semaforo(void * p){
         
- }
-cant2--;
 }
-}
-
-*/
