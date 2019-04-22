@@ -2,28 +2,15 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <stdbool.h>
-#include <unistd.h>
+#include<unistd.h>
 #include "creacion.c"
 #include "read.c"
 #include <math.h>
 #include <time.h>
+ 
 
-/* STATE_A = THREAD A runs next, STATE_B = THREAD B runs next */
-enum
-{
-        STATE_A,
-        STATE_B
-} state = STATE_A;
-pthread_cond_t condA = PTHREAD_COND_INITIALIZER;
-pthread_cond_t condB = PTHREAD_COND_INITIALIZER;
-
-char *direccionCarros;
-char *direccionPuente;
-//Contador de carros creados en el este
-int contadorCarosEO = 0;
-//Contador de carros creados en el oeste
-int contadorCarosOE = 0;
-//direccion representada por un dato numerico
+int contadorCarosEO=0;
+int contadorCarosOE=0;
 int direccion;
 //cantidad de carros que estan cruzando el puente
 int cantCarrosenPuente = 0;
@@ -63,27 +50,34 @@ int cantidadAmbulanciasOeste();
 void init_ambulanciasOE();
 //inicializa las ambulancias este-oeste
 void init_ambulanciasEO();
-//hilos de direccion
+//funcion que verifica si es seguro pasar el puente
 int esSeguro(int dir);
-void LlegaApuente(int dir);
+//pasa por el puente
+void  LlegaApuente(int dir);
+//carro sale del puente
 void salePuente(int dir);
-//hilo de ejecucion
+//cantidad de carros sentido Este-Oeste
+int cant;
+//cantidad de carros sentido Oeste-Este 
+int cant2;
+//hilo
 pthread_t OE;
-//mutex que se bloquea para manejar el flujo del transito 
-pthread_mutex_t MonitorLock;
-
-void bloquea(int o);
+//hilo
+pthread_t EO;
 //arreglo ambulancias este-oeste
 int *arraye_o;
 //arreglo ambulancias oeste-este
 int *arrayo_e;
-//arreglo donde se guardan los datos de configuracion
-size_t arreglo[] = {};
-
+//arreglo principal donde se almacenan los datos
+size_t arreglo[]={};
+//funcion que bloquea el puenre
 void bloquearPuente();
+//funcion que desbloquea el puente
 void desbloquearPuente();
-void *crearCarro(void *p);
-char *dir(int dir);
+//funcion que crea los carros como hilos
+void * crearCarro(void * p);
+
+
 
 int main()
 {
@@ -97,9 +91,12 @@ int main()
         pthread_join(OE, NULL);
 }
 
-float formula(int promedio)
-{
-        float ln = log(1 - randomentre());
+
+
+
+
+float formula(int promedio){
+        float ln= log(1-randomentre());
         return -promedio * ln;
 }
 
@@ -123,47 +120,45 @@ void crearpuente()
         }
 }
 
-void *carroEO(void *p)
-{
-        //init_ambulanciasOE();
-        printf("Creando carro EO\n");
-        contadorCarrosEste++;
-        bool esAmbulancia = false;
-        int cantidadAmbulancias = cantidadAmbulanciasEste();
-        for (int i = 0; i < cantidadAmbulancias; i++)
-        {
-                if (arraye_o[i] == contadorCarrosEste)
-                {
-                        esAmbulancia = true;
-                        break;
-                }
+void* carroEO(void * p){
+    
+contadorCarrosEste++;
+bool esAmbulancia=false;
+int cantidadAmbulancias=cantidadAmbulanciasEste();
+for(int i=0;i<cantidadAmbulancias; i++){
+        if(arraye_o[i]==contadorCarrosEste){
+         esAmbulancia=true;
+         break;
         }
-        int velocidad = calculavelocidad(arreglo[7], arreglo[8]);
+}     
+int velocidad = calculavelocidad(arreglo[7],arreglo[8]);
+// if(esAmbulancia)
+// printf("Soy una ambulanciaEO y vengo a esta velocidad:%d \n",velocidad);
+// else
+// printf("Soy un CarroEO y vengo a esta velocidad:%d \n",velocidad);
+
 }
 
-void *carroOE(void *p)
-{
-        //init_ambulanciasOE();
-        contadorCarrosOeste++;
-        bool esAmbulancia = false;
-        int cantidadAmbulancias = cantidadAmbulanciasOeste();
-        for (int i = 0; i < cantidadAmbulancias; i++)
-        {
-                if (arrayo_e[i] == contadorCarrosOeste)
-                {
-                        esAmbulancia = true;
-                        break;
-                }
+void* carroOE(void * p){
+contadorCarrosOeste++;
+bool esAmbulancia=false;
+int cantidadAmbulancias=cantidadAmbulanciasOeste();
+for(int i=0;i<cantidadAmbulancias; i++){
+        if(arrayo_e[i]==contadorCarrosOeste){
+         esAmbulancia=true;
+         break;
         }
-        int velocidad = calculavelocidad(arreglo[14], arreglo[15]);
-        if (esAmbulancia)
-                printf("Soy una ambulanciaOE y vengo a esta velocidad:%d \n", velocidad);
-        else
-                printf("Soy un CarroOE y vengo a esta velocidad:%d \n", velocidad);
+}     
+int velocidad = calculavelocidad(arreglo[14],arreglo[15]);
+if(esAmbulancia)
+printf("Soy una ambulanciaOE y vengo a esta velocidad:%d \n", velocidad);
+else
+printf("Soy un CarroOE y vengo a esta velocidad:%d \n",velocidad);
 }
 
-int calculavelocidad(int vmax, int vmin)
-{
+
+
+int calculavelocidad(int vmax, int vmin){
         time_t t;
         srand((unsigned)time(&t));
         return (int)(rand() % (vmax - vmin + 1)) + vmin;
@@ -175,26 +170,24 @@ int cantidadAmbulanciasEste()
 }
 int cantidadAmbulanciasOeste()
 {
-        return (int)arreglo[17] * arreglo[11] / 100;puente
+        return (int)arreglo[17] * arreglo[11] / 100;
 }
 
-void probaAmbulancia(int cantidadAmbu, int totalCarros, int array[])
-{
-        srand(time(NULL));
-        int rangoReal = (int)totalCarros / cantidadAmbu;
-        int rangoVariable;
-        int numero = 0;
-        int i = 0;
-        int aux = 0;
-        for (i; i < cantidadAmbu; i++)
-        {
-                rangoVariable = numero + rangoReal;
-                if (rangoVariable > totalCarros)
-                        rangoVariable = totalCarros;
-                aux = numero + 1;
-                numero = (int)rand() % (rangoVariable - aux) + aux;
-                array[i] = numero;
-        }
+void probaAmbulancia(int cantidadAmbu,int totalCarros, int array[]){
+ srand(time(NULL));
+ int rangoReal=(int)totalCarros/cantidadAmbu;
+ int rangoVariable;
+ int numero=0;
+ int i=0;
+ int aux=0;
+ for(i; i<cantidadAmbu; i++){
+  rangoVariable=numero+rangoReal;
+  if(rangoVariable>totalCarros)
+        rangoVariable=totalCarros;
+  aux=numero+1;    
+  numero=(int)rand() % (rangoVariable-aux) + aux;
+  array[i]=numero;
+ }
 }
 void init_ambulanciasEO()
 {
@@ -216,17 +209,18 @@ int esSeguro(int dir)
 
 void LlegaApuente(int dir)
 {
-        bloquearPuente();
-        if (!esSeguro(dir))
-        {
-                Esperando[dir]++;
-                while (!esSeguro(dir))
-                        pthread_cond_wait(&(EsteOeste[dir]), &MonitorLock);
-                Esperando[dir]--;
-        }
-        cantCarrosenPuente++;
-        direccion = dir;
-        desbloquearPuente();
+     bloquearPuente();      
+          if (!esSeguro(dir)) {
+               Esperando[dir]++; 
+               for(int i=0; i<arreglo[0]; i++){  
+               while (!esSeguro(dir))    
+                    pthread_cond_wait(&(EsteOeste[dir]), &puente[i]);
+               }
+               Esperando[dir]--;  
+          }
+          cantCarrosenPuente++;           
+          direccion = dir;      
+    desbloquearPuente();     
 }
 
 void salePuente(int dir)
@@ -314,5 +308,15 @@ char *dir(int dir)
         if (dir == 0)
                 return a = "EO";
         else
-                return a = "OE";
+        return a="OE";
+        
+        
+
 }
+
+void * semaforo(void * p){
+        
+}
+
+
+
